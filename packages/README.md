@@ -1,12 +1,14 @@
-# 快速开始
+# lxjr-component 组件库
 
-### 1. 安装组件库
+### 快速开始
+
+#### 1. 安装组件库
 
 ```bash
 npm i lxjr-component
 ```
 
-### 2. 引用组件库
+#### 2. 引用组件库
 
 ```javascript
 // 全部引入
