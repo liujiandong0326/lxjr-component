@@ -37,6 +37,7 @@
     "gulp-less": "^5.0.0",
     "gulp-minify-css": "^1.2.4",
     "less-loader": "^7.3.0",
+    "lodash": "^4.17.21",
     "vue-loader": "^15.9.8",
     "vue-template-compiler": "^2.6.14",
     "vuepress": "^1.9.7",

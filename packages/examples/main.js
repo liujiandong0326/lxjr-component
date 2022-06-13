@@ -5,6 +5,7 @@ import 'ant-design-vue/dist/antd.css'
 
 import '../components/css/demo.less'
 import '../components/css/card.less'
+import '../components/css/pro-table-card.less'
 import Demo from '../components/lib/demo'
 import Card from '../components/lib/card'
 import ProTable from '../components/lib/pro-table'
