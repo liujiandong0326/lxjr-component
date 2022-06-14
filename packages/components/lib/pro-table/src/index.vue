@@ -75,7 +75,7 @@
               v-if="searchFormList.length > 5"
               @click="toggle"
             >
-              展开{{ searchFormList.length }}
+              展开
               <a-icon :type="expand ? 'up' : 'down'" />
             </a>
           </a-col>
