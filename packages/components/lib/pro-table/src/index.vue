@@ -6,62 +6,60 @@
           <template v-for="(item, index) in searchFormList">
             <template v-if="showItem(index)">
               <a-col :span="8" :key="item.dataIndex">
-                <template v-if="item.valueType !== 'option'">
-                  <a-form-model-item
-                    :labelCol="{
-                      style: 'width: 100px;',
-                    }"
-                    :wrapperCol="{ flex: 1 }"
-                  >
-                    <!-- label 超出4个字显示省略号 -->
-                    <template v-if="item.title.length <= 4" slot="label">
-                      {{ item.title }}
-                    </template>
-                    <template v-else slot="label">
-                      {{ item.title.substring(0, 2) }}
-                      <a-tooltip placement="top">
-                        <template slot="title">
-                          <span>{{ item.title }}</span>
-                        </template>
-                        <span style="cursor: pointer">...</span>
-                      </a-tooltip>
-                      {{ item.title.substring(item.title.length - 1) }}
-                    </template>
+                <a-form-model-item
+                  :labelCol="{
+                    style: 'width: 100px;',
+                  }"
+                  :wrapperCol="{ flex: 1 }"
+                >
+                  <!-- label 超出4个字显示省略号 -->
+                  <template v-if="item.title.length <= 4" slot="label">
+                    {{ item.title }}
+                  </template>
+                  <template v-else slot="label">
+                    {{ item.title.substring(0, 2) }}
+                    <a-tooltip placement="top">
+                      <template slot="title">
+                        <span>{{ item.title }}</span>
+                      </template>
+                      <span style="cursor: pointer">...</span>
+                    </a-tooltip>
+                    {{ item.title.substring(item.title.length - 1) }}
+                  </template>
 
-                    <a-input
-                      v-model="tableForm[item.dataIndex]"
-                      v-if="!item.valueType"
-                      :placeholder="item.placeholder || `请输入${item.title}`"
-                    />
-                    <a-select
-                      v-model="tableForm[item.dataIndex]"
-                      v-if="item.valueType === 'select'"
-                      :allowClear="item.allowClear || true"
-                      :placeholder="item.placeholder || `请选择${item.title}`"
+                  <a-input
+                    v-model="tableForm[item.dataIndex]"
+                    v-if="!item.valueType"
+                    :placeholder="item.placeholder || `请输入${item.title}`"
+                  />
+                  <a-select
+                    v-model="tableForm[item.dataIndex]"
+                    v-if="item.valueType === 'select'"
+                    :allowClear="item.allowClear || true"
+                    :placeholder="item.placeholder || `请选择${item.title}`"
+                  >
+                    <a-select-option
+                      v-for="item in item.valueEnum"
+                      :value="item.value"
+                      :key="item.value"
                     >
-                      <a-select-option
-                        v-for="item in item.valueEnum"
-                        :value="item.value"
-                        :key="item.value"
-                      >
-                        {{ item.text }}
-                      </a-select-option>
-                    </a-select>
-                    <a-range-picker
-                      v-model="tableForm[item.dataIndex]"
-                      v-if="item.valueType === 'dateRange'"
-                      format="YYYY-MM-DD"
-                      valueFormat="YYYY-MM-DD"
-                    />
-                    <a-date-picker
-                      style="width: 100%"
-                      v-model="tableForm[item.dataIndex]"
-                      v-if="item.valueType === 'date'"
-                      format="YYYY-MM-DD"
-                      valueFormat="YYYY-MM-DD"
-                    />
-                  </a-form-model-item>
-                </template>
+                      {{ item.text }}
+                    </a-select-option>
+                  </a-select>
+                  <a-range-picker
+                    v-model="tableForm[item.dataIndex]"
+                    v-if="item.valueType === 'dateRange'"
+                    format="YYYY-MM-DD"
+                    valueFormat="YYYY-MM-DD"
+                  />
+                  <a-date-picker
+                    style="width: 100%"
+                    v-model="tableForm[item.dataIndex]"
+                    v-if="item.valueType === 'date'"
+                    format="YYYY-MM-DD"
+                    valueFormat="YYYY-MM-DD"
+                  />
+                </a-form-model-item>
               </a-col>
             </template>
           </template>
@@ -77,7 +75,7 @@
               v-if="searchFormList.length > 5"
               @click="toggle"
             >
-              展开
+              展开{{ searchFormList.length }}
               <a-icon :type="expand ? 'up' : 'down'" />
             </a>
           </a-col>
@@ -102,59 +100,62 @@
         </a-row>
       </a-form>
     </a-card>
-    <a-card class="pro-table-card">
-      <div class="tool-bar-container">
-        <span class="title">
-          {{ (toolBarOptions && toolBarOptions.title) || '' }}
-        </span>
-        <div class="tool-list" v-if="toolBarOptions">
-          <a-button
-            type="link"
-            v-for="(item, index) in toolBarOptions.toolList"
-            :key="index"
-            @click="item.click()"
-          >
-            <svg class="icon" aria-hidden="true">
-              <use
-                :xlink:href="
-                  item.icon === 'add' ? '#iconxinzeng' : '#iconxiazai'
-                "
-              />
-            </svg>
-            {{ item.text }}
-          </a-button>
+    <a-spin :spinning="tableLoading">
+      <a-card class="pro-table-card">
+        <div class="tool-bar-container">
+          <span class="title">
+            {{ (toolBarOptions && toolBarOptions.title) || '' }}
+          </span>
+          <div class="tool-list" v-if="toolBarOptions">
+            <a-button
+              type="link"
+              v-for="(item, index) in toolBarOptions.toolList"
+              :key="index"
+              @click="item.click()"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use
+                  :xlink:href="
+                    item.icon === 'add' ? '#iconxinzeng' : '#iconxiazai'
+                  "
+                />
+              </svg>
+              {{ item.text }}
+            </a-button>
+          </div>
         </div>
-      </div>
-      <div class="table-container">
-        <a-table
-          ref="tableRef"
-          :size="size"
-          :rowKey="rowKey || 'id'"
-          :columns="mergeColumns"
-          :data-source="tableData"
-          :scroll="scroll"
-          :pagination="paginationOptions"
-          v-bind="tableOption"
-          @change="handleClickPage"
-        >
-          <!--自定义列内容渲染项-->
-          <template
-            v-for="colCustom in columnsCustom"
-            :slot="colCustom.customRender"
-            slot-scope="text, record, index, column"
+        <div class="table-container">
+          <a-table
+            ref="tableRef"
+            :size="size"
+            :rowKey="rowKey || 'id'"
+            :columns="mergeColumns"
+            :data-source="tableData"
+            :scroll="scroll"
+            :pagination="paginationOptions"
+            :rowSelection="rowSelection"
+            v-bind="tableOption"
+            @change="handleClickPage"
           >
-            <slot
-              :name="colCustom.customRender"
-              :tableRow="record"
-              :index="index"
-              :text="text"
-              :column="column"
-              v-bind:item="text"
-            ></slot>
-          </template>
-        </a-table>
-      </div>
-    </a-card>
+            <!--自定义列内容渲染项-->
+            <template
+              v-for="colCustom in columnsCustom"
+              :slot="colCustom.customRender"
+              slot-scope="text, record, index, column"
+            >
+              <slot
+                :name="colCustom.customRender"
+                :tableRow="record"
+                :index="index"
+                :text="text"
+                :column="column"
+                v-bind:item="text"
+              ></slot>
+            </template>
+          </a-table>
+        </div>
+      </a-card>
+    </a-spin>
   </div>
 </template>
 
@@ -258,6 +259,13 @@ export default {
       type: [Boolean, Object],
       default: true,
     },
+    /**
+     * 显示选择框
+     */
+    showSelection: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     params: {
@@ -336,6 +344,20 @@ export default {
       }
       return defaultOptions
     },
+    rowSelection() {
+      const { selectedRowKeys } = this
+
+      if (this.showSelection) {
+        return {
+          selectedRowKeys,
+          onChange: this.onSelectChange,
+          hideDefaultSelections: true,
+          onSelection: this.onSelection,
+        }
+      }
+
+      return null
+    },
   },
   async created() {
     await this.handleRequest()
@@ -350,9 +372,36 @@ export default {
       current: 1,
       timer: null,
       endTime: true,
+      tableLoading: true,
+      selectedRowKeys: [],
     }
   },
   methods: {
+    // ------------------  对外暴露方法  ------------------
+    // 获取 searchFrom 的值
+    getSearchParams() {
+      return { ...this.tableForm, ...this.params }
+    },
+    // 重新获取数据
+    async reload() {
+      await this.handleRequest()
+    },
+    // 重置 searchFrom 内容
+    reset() {
+      this.tableForm = {}
+      this.handleRequest()
+    },
+    // 获取选中的值
+    getSelectedRowKeys() {
+      return [...this.selectedRowKeys]
+    },
+    clearSelectedRowKeys() {
+      this.selectedRowKeys = []
+    },
+    // ------------------  组件内部方法  ------------------
+    onSelectChange(selectedRowKeys) {
+      this.selectedRowKeys = selectedRowKeys
+    },
     // 设置按下 shift 的值
     setKeyStatus(keyCode, status) {
       switch (keyCode) {
@@ -383,9 +432,6 @@ export default {
         return index < 5
       }
     },
-    getSearchParams() {
-      return { ...this.tableForm, ...this.params }
-    },
     async handleRequest() {
       let searchForm = { ...this.tableForm, ...this.params }
       if (this.pagination) {
@@ -393,6 +439,7 @@ export default {
         searchForm = { ...searchForm, current, pageSize }
       }
       const res = await this.request({ ...searchForm })
+      this.tableLoading = false
       this.tableData = this.formatTableData(res.data)
 
       this.total = res.total || 0
@@ -428,14 +475,6 @@ export default {
     handleClickPage({ current, pageSize }) {
       this.current = current
       this.pageSize = pageSize
-      this.handleRequest()
-    },
-    // 重新获取数据
-    async reload() {
-      await this.handleRequest()
-    },
-    reset() {
-      this.tableForm = {}
       this.handleRequest()
     },
     // 处理键盘按下事件
