@@ -5,6 +5,7 @@
     :tool-bar-options="toolBarOptions"
     :rowKey="(record, index) => index"
     :index-options="{ title: '#' }"
+    :pagination="{ pageSize: 5 }"
   >
     <template #action="{ tableRow }">
       <a-tooltip style="margin-right: 8px">

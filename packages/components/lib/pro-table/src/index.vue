@@ -127,20 +127,13 @@
       </div>
       <div class="table-container">
         <a-table
+          ref="tableRef"
           :size="size"
           :rowKey="rowKey || 'id'"
           :columns="mergeColumns"
           :data-source="tableData"
           :scroll="scroll"
-          :pagination="
-            pagination && {
-              total,
-              current,
-              pageSize,
-              showQuickJumper: true,
-              showSizeChanger: true,
-            }
-          "
+          :pagination="paginationOptions"
           v-bind="tableOption"
           @change="handleClickPage"
         >
@@ -246,7 +239,7 @@ export default {
       required: true,
     },
     pagination: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: true,
     },
     scroll: {
@@ -255,6 +248,12 @@ export default {
         x: 1200,
       }),
     },
+    /**
+     * Boolean | Object
+     * Object: {
+     *   title: String
+     * }
+     */
     indexOptions: {
       type: [Boolean, Object],
       default: true,
@@ -283,6 +282,7 @@ export default {
         .filter(item => item.scopedSlots)
         .map(item => item.scopedSlots)
     },
+    //
     searchOptions() {
       if (this.search === false) {
         return null
@@ -296,9 +296,7 @@ export default {
     searchFormList() {
       return this.columns.filter(item => !item.hideInSearch)
     },
-    hideItemSum() {
-      return this.columns.filter(item => item.hideInSearch).length
-    },
+    // 合并 table 的 columens
     mergeColumns() {
       let columns = cloneDeep(this.columns.filter(item => !item.hideInTable))
       if (this.indexOptions) {
@@ -314,6 +312,30 @@ export default {
       }
       return columns
     },
+    // 分页配置
+    paginationOptions() {
+      if (this.pagination === false) return false
+
+      const { total, current, pageSize } = this
+      const defaultOptions = {
+        total,
+        current,
+        pageSize,
+        showQuickJumper: true,
+        showSizeChanger: true,
+      }
+
+      if (
+        typeof this.pagination === 'object' &&
+        Object.keys(this.pagination).length
+      ) {
+        return {
+          ...defaultOptions,
+          ...this.pagination,
+        }
+      }
+      return defaultOptions
+    },
   },
   async created() {
     await this.handleRequest()
@@ -326,9 +348,34 @@ export default {
       total: 0,
       pageSize: 10,
       current: 1,
+      timer: null,
+      endTime: true,
     }
   },
   methods: {
+    // 设置按下 shift 的值
+    setKeyStatus(keyCode, status) {
+      switch (keyCode) {
+        case 16:
+          if (this.onShift === status) return
+          this.onShift = status
+          break
+      }
+    },
+    // table 横向滚动事件监听
+    handleScroll() {
+      if (!this.onShift && this.endTime) {
+        this.endTime = false
+        clearTimeout(this.timer)
+        this.$message.warning(
+          '按住【Shift】滚动鼠标滑轮，可以快速滑动横向滚动条',
+          5,
+        )
+        this.timer = setTimeout(() => {
+          this.endTime = true
+        }, 5500)
+      }
+    },
     showItem(index) {
       if (this.expand) {
         return true
@@ -378,13 +425,6 @@ export default {
     toggle() {
       this.expand = !this.expand
     },
-    isShow(i) {
-      if (this.expand) {
-        return true
-      } else {
-        return i - this.hideItemSum < this.searchOptions.count
-      }
-    },
     handleClickPage({ current, pageSize }) {
       this.current = current
       this.pageSize = pageSize
@@ -398,6 +438,26 @@ export default {
       this.tableForm = {}
       this.handleRequest()
     },
+    // 处理键盘按下事件
+    handleKeyDown(e) {
+      this.setKeyStatus(e.keyCode, true)
+    },
+    // 处理键盘抬起事件
+    handleKeyUp(e) {
+      this.setKeyStatus(e.keyCode, false)
+    },
+  },
+  mounted() {
+    document.addEventListener('keydown', this.handleKeyDown)
+    document.addEventListener('keyup', this.handleKeyUp)
+
+    this.dom = document.querySelector('.ant-table-body')
+    this.dom.addEventListener('scroll', this.handleScroll)
+  },
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.removeEventListener('keyup', this.handleKeyUp)
+    this.dom.removeEventListener('scroll', this.handleScroll)
   },
 }
 </script>
