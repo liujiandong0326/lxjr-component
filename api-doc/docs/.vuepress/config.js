@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'lxjr-component',
+  title: '基于 antdv 的组件库',
   base: '/lxjr-component/',
   themeConfig: {
     nav: [
@@ -16,7 +16,7 @@ module.exports = {
         link: 'https://www.npmjs.com/package/lxjr-component',
       },
     ],
-    sidebar: ['/', '/componentDoc/card', '/componentDoc/pro-table'],
+    sidebar: ['/', '/componentDoc/pro-table'],
   },
   chainWebpack(config) {
     // 处理因为 vuepress 的 cors 和 antd vue 版本不一致的问题

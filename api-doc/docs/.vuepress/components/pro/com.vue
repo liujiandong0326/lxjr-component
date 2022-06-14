@@ -162,6 +162,11 @@
 <script>
 import cloneDeep from 'lodash/cloneDeep'
 
+const SEARCH_DEFAULT = {
+  count: 6,
+  labelWidth: 80,
+}
+
 export default {
   name: 'pro-table',
   props: {
@@ -195,6 +200,10 @@ export default {
     },
     rowKey: {
       type: [String, Function],
+    },
+    search: {
+      type: [Object, Boolean],
+      default: () => SEARCH_DEFAULT,
     },
     params: {
       type: Object,
@@ -258,16 +267,16 @@ export default {
       default: false,
     },
   },
-  // watch: {
-  //   params: {
-  //     deep: true,
-  //     handler(newValue) {
-  //       if (newValue) {
-  //         this.handleRequest()
-  //       }
-  //     },
-  //   },
-  // },
+  watch: {
+    params: {
+      deep: true,
+      handler(newValue) {
+        if (newValue) {
+          this.handleRequest()
+        }
+      },
+    },
+  },
   computed: {
     // 是否显示搜索表单
     showSearchForm() {
@@ -282,6 +291,15 @@ export default {
         .map(item => item.scopedSlots)
     },
     //
+    searchOptions() {
+      if (this.search === false) {
+        return null
+      }
+      return {
+        ...SEARCH_DEFAULT,
+        ...this.search,
+      }
+    },
     // 查询表单要显示的表单项
     searchFormList() {
       return this.columns.filter(item => !item.hideInSearch)
@@ -482,3 +500,7 @@ export default {
   },
 }
 </script>
+
+<style lang="less">
+@import './pro-table-card.less';
+</style>
