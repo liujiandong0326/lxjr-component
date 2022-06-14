@@ -160,7 +160,7 @@
 </template>
 
 <script>
-import { cloneDeep } from 'lodash'
+import cloneDeep from 'lodash/cloneDeep'
 
 const SEARCH_DEFAULT = {
   count: 6,
