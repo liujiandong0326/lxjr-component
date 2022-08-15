@@ -1,32 +1,12 @@
 <template>
   <div class="pro-table">
     <a-card class="pro-table-card" v-if="showSearchForm">
-      <a-form layout="horizontal" :model="tableForm">
+      <a-form layout="vertical" :model="tableForm">
         <a-row :gutter="24" ref="rows">
           <template v-for="(item, index) in searchFormList">
             <template v-if="showItem(index)">
-              <a-col :span="8" :key="item.dataIndex">
-                <a-form-model-item
-                  :labelCol="{
-                    style: 'width: 100px;',
-                  }"
-                  :wrapperCol="{ flex: 1 }"
-                >
-                  <!-- label 超出4个字显示省略号 -->
-                  <template v-if="item.title.length <= 4" slot="label">
-                    {{ item.title }}
-                  </template>
-                  <template v-else slot="label">
-                    {{ item.title.substring(0, 2) }}
-                    <a-tooltip placement="top">
-                      <template slot="title">
-                        <span>{{ item.title }}</span>
-                      </template>
-                      <span style="cursor: pointer">...</span>
-                    </a-tooltip>
-                    {{ item.title.substring(item.title.length - 1) }}
-                  </template>
-
+              <a-col :span="6" :key="item.dataIndex">
+                <a-form-model-item :label="item.title">
                   <a-input
                     v-model="tableForm[item.dataIndex]"
                     v-if="!item.valueType"
@@ -63,7 +43,10 @@
               </a-col>
             </template>
           </template>
-          <a-col v-if="!expand" :span="8" :style="{ textAlign: 'right' }">
+          <a-col
+            :span="spanLength"
+            :style="{ textAlign: 'right', paddingTop: '30px' }"
+          >
             <a-button type="primary" html-type="submit" @click="handleRequest">
               查询
             </a-button>
@@ -72,28 +55,10 @@
             </a-button>
             <a
               :style="{ marginLeft: '8px', fontSize: '12px' }"
-              v-if="searchFormList.length > 5"
+              v-if="searchFormList.length > 7"
               @click="toggle"
             >
-              展开
-              <a-icon :type="expand ? 'up' : 'down'" />
-            </a>
-          </a-col>
-        </a-row>
-        <a-row>
-          <a-col v-if="expand" :span="24" :style="{ textAlign: 'right' }">
-            <a-button type="primary" html-type="submit" @click="handleRequest">
-              查询
-            </a-button>
-            <a-button :style="{ marginLeft: '8px' }" @click="reset">
-              重置
-            </a-button>
-            <a
-              :style="{ marginLeft: '8px', fontSize: '12px' }"
-              v-if="searchFormList.length > 5"
-              @click="toggle"
-            >
-              关闭
+              {{ expand ? '关闭' : '展开' }}
               <a-icon :type="expand ? 'up' : 'down'" />
             </a>
           </a-col>
@@ -152,6 +117,7 @@
                 v-bind:item="text"
               ></slot>
             </template>
+            <slot></slot>
           </a-table>
         </div>
       </a-card>
@@ -340,6 +306,15 @@ export default {
 
       return null
     },
+    spanLength() {
+      const length = this.searchFormList.length
+      if (length > 7 && !this.expand) {
+        return 6
+      } else {
+        const surplus = length % 4
+        return (4 - surplus) * 6
+      }
+    },
   },
   async created() {
     await this.handleRequest()
@@ -411,7 +386,7 @@ export default {
       if (this.expand) {
         return true
       } else {
-        return index < 5
+        return index < 7
       }
     },
     async handleRequest() {

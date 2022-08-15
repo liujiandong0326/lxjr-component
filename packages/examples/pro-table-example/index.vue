@@ -79,6 +79,31 @@ export default {
           dataIndex: 'entryName',
         },
         {
+          width: 200,
+          title: '项目名称1',
+          dataIndex: 'entryName1',
+        },
+        {
+          width: 200,
+          title: '项目名称2',
+          dataIndex: 'entryName2',
+        },
+        {
+          width: 200,
+          title: '项目名称3',
+          dataIndex: 'entryName3',
+        },
+        {
+          width: 200,
+          title: '项目名称4',
+          dataIndex: 'entryName5',
+        },
+        {
+          width: 200,
+          title: '项目名称6',
+          dataIndex: 'entryName6',
+        },
+        {
           width: 160,
           title: '创建时间',
           dataIndex: 'time',
